@@ -1,12 +1,11 @@
 name: Deploy Frontend Service
 
 on:
-  push:
-    paths:
-      - '.env'
-      - 'docker-compose.yml'
-      - 'README.md'
-      - 'nginx/**'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "The tag of the Docker image to deploy (e.g., v1.0.0)"
+        required: true
 
 jobs:
   deploy-frontend:

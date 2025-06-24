@@ -1,18 +1,29 @@
-- name: Deploy to Server
-  uses: appleboy/ssh-action@v0.1.8
-  with:
-    script: |
-      cd /opt/hr-deploy
-      # 创建 .env 文件
-      cat > .env << EOF
-      MYSQL_ROOT_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD }}
-      MYSQL_DATABASE=${{ secrets.MYSQL_DB }}
-      MYSQL_USER=${{ secrets.MYSQL_USER }}
-      MYSQL_PASSWORD=${{ secrets.MYSQL_PASSWORD }}
-      FRONTEND_TAG=v1.0.0
-      BACKTEND_TAG=latest
-      DATABASE_URL=mysql://${{ secrets.MYSQL_USER }}:${{ secrets.MYSQL_PASSWORD }}@mysql:3306/${{ secrets.MYSQL_DB }}
-      REDIS_URL=redis://redis:6379
-      EOF
-      # 然后启动服务
-      docker-compose up -d
+name: Deploy Database Services
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy-db:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy to Server
+        uses: appleboy/ssh-action@v0.1.8
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.ALIYUN_USERNAME }}
+          key: ${{ secrets.ALIYUN_SSH_KEY }}
+          port: 22
+          script: |
+            cd /opt/hr-deploy
+            # 创建 .env 文件（只包含数据库配置）
+            cat > .env << EOF
+            MYSQL_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD }}
+            MYSQL_DATABASE=${{ secrets.MYSQL_DB }}
+            MYSQL_USER=${{ secrets.MYSQL_USER }}
+            DATABASE_URL=mysql://${{ secrets.MYSQL_USER }}:${{ secrets.MYSQL_ROOT_PASSWORD }}@mysql:3306/${{ secrets.MYSQL_DB }}
+            REDIS_URL=redis://redis:6379
+            EOF
+            # 只启动数据库服务（使用官方镜像，无需登录 Harbor）
+            docker-compose up -d mysql redis

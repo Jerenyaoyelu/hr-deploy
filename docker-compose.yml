@@ -5,10 +5,11 @@ services:
     image: mysql:8.0
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
       MYSQL_DATABASE: ${MYSQL_DATABASE}
       MYSQL_USER: ${MYSQL_USER}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_PORT: 3306
+      MYSQL_SERVER: localhost
     volumes:
       - mysql_data:/var/lib/mysql
     networks:
@@ -28,8 +29,8 @@ services:
       - mysql
       - redis
     environment:
-      - DATABASE_URL=mysql://root:your_password@mysql:3306/hr_db
-      - REDIS_URL=redis://redis:6379
+      - DATABASE_URL=${DATABASE_URL}
+      - REDIS_URL=${REDIS_URL}
     networks:
       - backend
 
