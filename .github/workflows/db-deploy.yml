@@ -6,6 +6,7 @@ on:
 jobs:
   deploy-db:
     runs-on: ubuntu-latest
+    environment: production # 指定环境名称
 
     steps:
       - name: Deploy to Server
