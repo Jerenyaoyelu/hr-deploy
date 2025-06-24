@@ -1,0 +1,28 @@
+name: Auto Sync hr-deploy to Server
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  sync-to-server:
+    runs-on: ubuntu-latest
+    environment: production # 指定环境名称
+    
+    steps:
+      - name: Sync hr-deploy code to server
+        uses: appleboy/ssh-action@v0.1.8
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.ALIYUN_USERNAME }}
+          key: ${{ secrets.ALIYUN_SSH_KEY }}
+          port: 22
+          script: |
+            if [ ! -d /opt/hr-deploy/.git ]; then
+              sudo rm -rf /opt/hr-deploy
+              sudo git clone git@github.com:Jerenyaoyelu/hr-deploy.git /opt/hr-deploy
+            else
+              cd /opt/hr-deploy
+              sudo git pull
+            fi
