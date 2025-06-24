@@ -21,7 +21,7 @@ jobs:
           script: |
             if [ ! -d /opt/hr-deploy/.git ]; then
               sudo rm -rf /opt/hr-deploy
-              sudo git clone https://github.com/Jerenyaoyelu/hr-deploy.git /opt/hr-deploy
+              sudo git clone https://${{ secrets.GITHUB_TOKEN }}@github.com/Jerenyaoyelu/hr-deploy.git /opt/hr-deploy
             else
               cd /opt/hr-deploy
               sudo git pull
