@@ -1,0 +1,18 @@
+- name: Deploy to Server
+  uses: appleboy/ssh-action@v0.1.8
+  with:
+    script: |
+      cd /opt/hr-deploy
+      # 创建 .env 文件
+      cat > .env << EOF
+      MYSQL_ROOT_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD }}
+      MYSQL_DATABASE=${{ secrets.MYSQL_DB }}
+      MYSQL_USER=${{ secrets.MYSQL_USER }}
+      MYSQL_PASSWORD=${{ secrets.MYSQL_PASSWORD }}
+      FRONTEND_TAG=v1.0.0
+      BACKTEND_TAG=latest
+      DATABASE_URL=mysql://${{ secrets.MYSQL_USER }}:${{ secrets.MYSQL_PASSWORD }}@mysql:3306/${{ secrets.MYSQL_DB }}
+      REDIS_URL=redis://redis:6379
+      EOF
+      # 然后启动服务
+      docker-compose up -d
