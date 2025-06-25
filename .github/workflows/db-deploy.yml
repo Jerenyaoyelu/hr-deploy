@@ -17,34 +17,7 @@ jobs:
           key: ${{ secrets.ALIYUN_SSH_KEY }}
           port: 22
           script: |
-            cd /opt/hr-deploy
-            
-            # 备份原有 .env 文件（如果存在）
-            if [ -f .env ]; then
-              cp .env .env.backup
-            fi
-            
-            # 创建或更新 .env 文件，保留原有内容
-            if [ -f .env ]; then
-              # 如果 .env 文件存在，先删除数据库相关的环境变量
-              grep -v -E "^(MYSQL_|DATABASE_URL=|REDIS_URL=)" .env > .env.tmp
-            else
-              # 如果 .env 文件不存在，创建空文件
-              touch .env.tmp
-            fi
-            
-            # 添加数据库配置到 .env 文件
-            cat >> .env.tmp << EOF
-            MYSQL_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD }}
-            MYSQL_DATABASE=${{ secrets.MYSQL_DB }}
-            MYSQL_USER=${{ secrets.MYSQL_USER }}
-            DATABASE_URL=mysql://${{ secrets.MYSQL_USER }}:${{ secrets.MYSQL_ROOT_PASSWORD }}@mysql:3306/${{ secrets.MYSQL_DB }}
-            REDIS_URL=redis://redis:6379
-            EOF
-            
-            # 替换原文件
-            mv .env.tmp .env
-            
+          
             # 预先拉取镜像，带重试机制
             echo "Pulling MySQL image..."
             docker pull mysql:8.0 || docker pull registry.cn-hangzhou.aliyuncs.com/library/mysql:8.0
