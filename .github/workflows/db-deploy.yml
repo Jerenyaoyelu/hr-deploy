@@ -17,13 +17,21 @@ jobs:
           key: ${{ secrets.ALIYUN_SSH_KEY }}
           port: 22
           script: |
-          
+            # 进入项目目录
+            cd /opt/hr-deploy
+            
+            # 检查 docker-compose.yml 文件是否存在
+            if [ ! -f docker-compose.yml ]; then
+              echo "Error: docker-compose.yml not found in /opt/hr-deploy"
+              exit 1
+            fi
+            
             # 预先拉取镜像，带重试机制
             echo "Pulling MySQL image..."
             docker pull mysql:8.0 || docker pull registry.cn-hangzhou.aliyuncs.com/library/mysql:8.0
             
             echo "Pulling Redis image..."
-            docker pull registry.cn-hangzhou.aliyuncs.com/library/redis:7-alpine || docker pull redis:7-alpine
+            docker pull redis:7-alpine || docker pull registry.cn-hangzhou.aliyuncs.com/redis/redis:7-alpine || docker pull daocloud.io/library/redis:7-alpine
             
             # 只启动数据库服务（使用官方镜像，无需登录 Harbor）
             docker-compose up -d mysql redis
