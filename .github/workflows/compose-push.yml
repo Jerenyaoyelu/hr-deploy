@@ -1,9 +1,7 @@
-name: Auto Sync hr-deploy to Server
+name: Sync hr-deploy to Server
 
 on:
-  push:
-    branches:
-      - main
+  workflow_dispatch:
 
 jobs:
   sync-to-server:
