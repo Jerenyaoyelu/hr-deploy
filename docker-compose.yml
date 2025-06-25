@@ -16,7 +16,7 @@ services:
       - backend
 
   redis:
-    image: redis:7-alpine
+    image: registry.cn-hangzhou.aliyuncs.com/library/redis:7-alpine
     restart: always
     networks:
       - backend
