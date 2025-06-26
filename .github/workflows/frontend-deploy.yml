@@ -2,14 +2,15 @@ name: Deploy Frontend Service
 
 on:
   workflow_dispatch:
-    inputs:
-      tag:
-        description: "The tag of the Docker image to deploy (e.g., v1.0.0)"
-        required: true
+    # inputs:
+    #   tag:
+    #     description: "The tag of the Docker image to deploy (e.g., v1.0.0)"
+    #     required: true
 
 jobs:
   deploy-frontend:
     runs-on: ubuntu-latest
+    environment: production # 指定环境名称
 
     steps:
       - name: Deploy to Alibaba Cloud
@@ -20,6 +21,8 @@ jobs:
           key: ${{ secrets.ALIYUN_SSH_KEY }}
           port: 22
           script: |
+            TAG=${{ github.event.inputs.tag }}
+            
             cd /opt/hr-deploy
             git pull
             echo "登录 Harbor..."

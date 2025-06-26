@@ -1,0 +1,35 @@
+name: Deploy Backend Service
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy-backend:
+    runs-on: ubuntu-latest
+    environment: production # 指定环境名称
+
+    steps:
+      - name: Deploy to Alibaba Cloud
+        uses: appleboy/ssh-action@v0.1.8
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.ALIYUN_USERNAME }}
+          key: ${{ secrets.ALIYUN_SSH_KEY }}
+          port: 22
+          script: |
+            cd /opt/hr-deploy
+            git pull
+            
+            echo "登录 Harbor..."
+            echo "${{ secrets.HARBOR_PASSWORD }}" | docker login http://118.178.189.219:8080 -u ${{ secrets.HARBOR_USERNAME }} --password-stdin
+            
+            echo "重启后端服务..."
+            docker-compose up -d hr-backend
+            
+            echo "等待服务启动..."
+            sleep 10
+            
+            echo "检查服务状态..."
+            docker-compose ps hr-backend
+            
+            echo "✅ 后端服务部署完成！"
