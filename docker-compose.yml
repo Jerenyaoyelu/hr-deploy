@@ -15,22 +15,14 @@ services:
     networks:
       - backend
 
-  redis:
-    image: redis:7-alpine
-    restart: always
-    networks:
-      - backend
-
   # 2. 后端服务（依赖数据库）
   hr-backend:
     image: your-harbor.com/your-project/hr-backend:${BACKTEND_TAG}
     restart: always
     depends_on:
       - mysql
-      - redis
     environment:
       - DATABASE_URL=${DATABASE_URL}
-      - REDIS_URL=${REDIS_URL}
     networks:
       - backend
 

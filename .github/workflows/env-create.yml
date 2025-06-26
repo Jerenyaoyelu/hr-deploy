@@ -25,7 +25,6 @@ jobs:
             MYSQL_DATABASE=${{ secrets.MYSQL_DB }}
             MYSQL_USER=${{ secrets.MYSQL_USER }}
             DATABASE_URL=mysql://${{ secrets.MYSQL_USER }}:${{ secrets.MYSQL_ROOT_PASSWORD }}@mysql:3306/${{ secrets.MYSQL_DB }}
-            REDIS_URL=redis://redis:6379
 
             # 添加镜像版本号
             BACKTEND_TAG=v1.0.0
