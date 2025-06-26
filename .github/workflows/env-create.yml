@@ -21,10 +21,9 @@ jobs:
             
             # 直接创建新的 .env 文件，覆盖原有内容
             cat > .env << EOF
-            MYSQL_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD }}
+            MYSQL_ROOT_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD }}
             MYSQL_DATABASE=${{ secrets.MYSQL_DB }}
-            MYSQL_USER=${{ secrets.MYSQL_USER }}
-            DATABASE_URL=mysql://${{ secrets.MYSQL_USER }}:${{ secrets.MYSQL_ROOT_PASSWORD }}@mysql:3306/${{ secrets.MYSQL_DB }}
+            DATABASE_URL=mysql://root:${{ secrets.MYSQL_ROOT_PASSWORD }}@mysql:3306/${{ secrets.MYSQL_DB }}
 
             # 添加镜像版本号
             BACKTEND_TAG=v1.0.0
