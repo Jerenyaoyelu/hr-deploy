@@ -26,12 +26,5 @@ jobs:
               exit 1
             fi
             
-            # 预先拉取镜像，带重试机制
-            echo "Pulling MySQL image..."
-            docker pull mysql:8.0 || docker pull registry.cn-hangzhou.aliyuncs.com/library/mysql:8.0
-            
-            echo "Pulling Redis image..."
-            docker pull redis:7-alpine || docker pull registry.cn-hangzhou.aliyuncs.com/redis/redis:7-alpine || docker pull daocloud.io/library/redis:7-alpine
-            
-            # 只启动数据库服务（使用官方镜像，无需登录 Harbor）
+            # 只启动数据库服务（Docker Compose 会自动拉取镜像）
             docker-compose up -d mysql redis
