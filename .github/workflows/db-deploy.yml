@@ -26,5 +26,12 @@ jobs:
               exit 1
             fi
             
-            # 只启动数据库服务（Docker Compose 会自动拉取镜像），自动确认
+            # 检查是否有 MySQL 容器在运行
+            if docker ps | grep -q mysql; then
+              echo "MySQL container is running, stopping it first..."
+              docker-compose stop mysql || true
+              docker-compose rm -f mysql || true
+            fi
+            
+            # 启动数据库服务（Docker Compose 会自动拉取镜像），自动确认
             echo "y" | docker-compose up -d mysql
