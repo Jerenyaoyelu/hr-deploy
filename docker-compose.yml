@@ -18,10 +18,10 @@ services:
       - backend
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
-      timeout: 20s
-      retries: 10
-      interval: 10s
-      start_period: 30s
+      timeout: 30s
+      retries: 5
+      interval: 30s
+      start_period: 60s
     command: --default-authentication-plugin=mysql_native_password
 
   # 2. 后端服务（依赖数据库）
@@ -30,8 +30,7 @@ services:
     image: 127.0.0.1:8080/hr-assist/hr-backend:${BACKTEND_TAG}
     restart: always
     depends_on:
-      mysql:
-        condition: service_healthy
+      - mysql
     environment:
       - DATABASE_URL=${DATABASE_URL}
     ports:
@@ -44,8 +43,7 @@ services:
     image: 127.0.0.1:8080/hr-assist/hr-pay:latest
     restart: always
     depends_on:
-      mysql:
-        condition: service_healthy
+      - mysql
     ports:
       - "9000:9000"
     networks:
