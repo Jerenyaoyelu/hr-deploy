@@ -11,31 +11,37 @@ services:
       MYSQL_SERVER: localhost
     volumes:
       - mysql_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
     networks:
       - backend
 
   # 2. 后端服务（依赖数据库）
   hr-backend:
-    image: your-harbor.com/your-project/hr-backend:${BACKTEND_TAG}
+    image: 118.178.189.219:8080/hr-assist/hr-backend:${BACKTEND_TAG}
     restart: always
     depends_on:
       - mysql
     environment:
       - DATABASE_URL=${DATABASE_URL}
+    ports:
+      - "8000:8000"
     networks:
       - backend
 
   hr-pay:
-    image: your-harbor.com/your-project/hr-pay:latest
+    image: 118.178.189.219:8080/hr-assist/hr-pay:latest
     restart: always
     depends_on:
       - mysql
+    ports:
+      - "9000:9000"
     networks:
       - backend
 
   # 3. 前端服务
   frontend:
-    image: 127.0.0.1:8080/hr-assist/hr-assistant-front:${FRONTEND_TAG}
+    image: 118.178.189.219:8080/hr-assist/hr-assistant-front:${FRONTEND_TAG}
     restart: always
     ports:
       - "3000:3000"

@@ -26,8 +26,8 @@ jobs:
             DATABASE_URL=mysql://root:${{ secrets.MYSQL_ROOT_PASSWORD }}@mysql:3306/${{ secrets.MYSQL_DB }}
 
             # 添加镜像版本号
-            BACKTEND_TAG=v1.0.0
-            FRONTEND_TAG=0.1.1-8
+            BACKTEND_TAG=v1.0.1-9
+            FRONTEND_TAG=0.1.1-10
             EOF
             
             echo "Environment file created successfully!"
