@@ -23,7 +23,6 @@ jobs:
             cat > .env << EOF
             MYSQL_ROOT_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD }}
             MYSQL_DATABASE=${{ secrets.MYSQL_DB }}
-            DATABASE_URL=mysql+pymysql://root:${{ secrets.MYSQL_ROOT_PASSWORD }}@mysql:3306/${{ secrets.MYSQL_DB }}
 
             # 添加镜像版本号
             BACKTEND_TAG=v1.0.1-9
