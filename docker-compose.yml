@@ -32,7 +32,7 @@ services:
     depends_on:
       - mysql
     environment:
-      - MYSQL_SERVER=localhost
+      - MYSQL_SERVER=mysql
       - MYSQL_USER=root
       - MYSQL_PASSWORD=${MYSQL_ROOT_PASSWORD}
       - MYSQL_DB=${MYSQL_DATABASE}
