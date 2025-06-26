@@ -33,6 +33,11 @@ services:
       - mysql
     environment:
       - DATABASE_URL=${DATABASE_URL}
+      - MYSQL_SERVER=localhost
+      - MYSQL_USER=root
+      - MYSQL_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_DB=${MYSQL_DATABASE}
+      - MYSQL_PORT=3306
     ports:
       - "8000:8000"
     networks:

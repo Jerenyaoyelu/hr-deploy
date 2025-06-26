@@ -20,16 +20,31 @@ jobs:
             cd /opt/hr-deploy
             git pull
             
+            echo "停止并删除后端容器..."
+            # 停止后端服务
+            docker-compose stop hr-backend || true
+            docker rm -f hr-backend || true
+            
             echo "走内网: Logging into Harbor..."
             echo "${{ secrets.HARBOR_PASSWORD }}" | docker login http://127.0.0.1:8080 -u ${{ secrets.HARBOR_USERNAME }} --password-stdin
             
-            echo "重启后端服务..."
+            echo "启动后端服务..."
             docker-compose up -d hr-backend
             
             echo "等待服务启动..."
-            sleep 10
+            sleep 15
             
             echo "检查服务状态..."
             docker-compose ps hr-backend
             
-            echo "✅ 后端服务部署完成！"
+            echo "检查后端容器日志..."
+            docker-compose logs hr-backend --tail=50
+            
+            # 检查容器是否正常运行
+            if docker-compose ps hr-backend | grep -q "Up"; then
+              echo "✅ 后端服务部署完成！"
+            else
+              echo "❌ 后端服务启动失败，查看详细日志..."
+              docker-compose logs hr-backend
+              exit 1
+            fi
