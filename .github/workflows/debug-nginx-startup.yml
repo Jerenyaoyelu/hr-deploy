@@ -1,0 +1,58 @@
+name: Debug Nginx Startup Issues
+
+on:
+  workflow_dispatch:
+
+jobs:
+  debug-nginx:
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+      - name: Debug Nginx Startup
+        uses: appleboy/ssh-action@v0.1.8
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.ALIYUN_USERNAME }}
+          key: ${{ secrets.ALIYUN_SSH_KEY }}
+          port: 22
+          script: |
+            cd /opt/hr-deploy
+            
+            echo "=== 检查端口占用 ==="
+            netstat -tlnp | grep :80 || echo "80 端口未被占用"
+            sudo netstat -tlnp | grep :80 || echo "sudo 检查 80 端口"
+            
+            echo -e "\n=== 检查 nginx 配置文件 ==="
+            cat nginx/nginx.conf
+            
+            echo -e "\n=== 测试 nginx 配置 ==="
+            docker run --rm -v $(pwd)/nginx/nginx.conf:/etc/nginx/nginx.conf:ro nginx:latest nginx -t || echo "nginx 配置测试失败"
+            
+            echo -e "\n=== 检查 nginx 容器日志 ==="
+            docker-compose logs nginx || echo "无法获取 nginx 日志"
+            
+            echo -e "\n=== 检查 nginx 容器状态 ==="
+            docker-compose ps nginx || echo "nginx 容器不存在"
+            
+            echo -e "\n=== 检查 Docker 网络 ==="
+            docker network ls
+            docker network inspect hr-deploy_backend || echo "backend 网络不存在"
+            
+            echo -e "\n=== 尝试手动启动 nginx 容器 ==="
+            docker run --rm -d --name test-nginx -p 8080:80 nginx:latest || echo "测试 nginx 启动失败"
+            docker stop test-nginx || echo "停止测试容器失败"
+            
+            echo -e "\n=== 检查系统资源 ==="
+            df -h
+            free -h
+            
+            echo -e "\n=== 尝试使用默认配置启动 nginx ==="
+            docker run --rm --name test-nginx-default -p 8080:80 nginx:latest nginx -t || echo "默认配置测试失败"
+            docker stop test-nginx-default || echo "停止默认测试容器失败"
+            
+            echo -e "\n=== 检查 nginx 配置文件权限 ==="
+            ls -la nginx/nginx.conf
+            
+            echo -e "\n=== 尝试直接运行 nginx 容器并查看错误 ==="
+            docker run --rm --name test-nginx-debug -v $(pwd)/nginx/nginx.conf:/etc/nginx/nginx.conf:ro nginx:latest nginx -g "daemon off;" || echo "nginx 启动失败" 
