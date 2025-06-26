@@ -27,11 +27,34 @@ jobs:
             fi
             
             # 检查是否有 MySQL 容器在运行
-            if docker ps | grep -q mysql; then
-              echo "MySQL container is running, stopping it first..."
-              docker-compose stop mysql || true
-              docker-compose rm -f mysql || true
+            if docker ps | grep -q hr-mysql; then
+              echo "MySQL 容器正在运行，停止并删除..."
+              docker-compose down || true
+              docker rm -f hr-mysql || true
+            elif docker ps -a | grep -q hr-mysql; then
+              echo "MySQL 容器存在但未运行，删除容器..."
+              docker rm -f hr-mysql || true
+            else
+              echo "MySQL 容器不存在，直接启动..."
             fi
             
-            # 启动数据库服务（Docker Compose 会自动拉取镜像），自动确认
-            echo "y" | docker-compose up -d mysql
+            # 启动数据库服务
+            echo "启动 MySQL 服务..."
+            docker-compose up -d mysql
+            
+            # 等待服务启动
+            echo "等待 MySQL 服务启动..."
+            sleep 30
+            
+            # 检查服务状态
+            echo "检查 MySQL 服务状态..."
+            docker-compose ps mysql
+            
+            # 检查 MySQL 是否正常运行
+            if docker-compose exec -T mysql mysqladmin ping -h localhost --silent; then
+              echo "✅ MySQL 服务启动成功！"
+            else
+              echo "❌ MySQL 服务启动失败，查看日志..."
+              docker-compose logs mysql
+              exit 1
+            fi

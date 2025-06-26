@@ -2,6 +2,7 @@ version: '3.8'
 services:
   # 1. 数据库服务（最先启动）
   mysql:
+    container_name: hr-mysql
     image: mysql:8.0
     restart: always
     environment:
@@ -15,13 +16,22 @@ services:
       - "3306:3306"
     networks:
       - backend
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+      interval: 10s
+      start_period: 30s
+    command: --default-authentication-plugin=mysql_native_password
 
   # 2. 后端服务（依赖数据库）
   hr-backend:
+    container_name: hr-backend
     image: 127.0.0.1:8080/hr-assist/hr-backend:${BACKTEND_TAG}
     restart: always
     depends_on:
-      - mysql
+      mysql:
+        condition: service_healthy
     environment:
       - DATABASE_URL=${DATABASE_URL}
     ports:
@@ -30,10 +40,12 @@ services:
       - backend
 
   hr-pay:
+    container_name: hr-pay
     image: 127.0.0.1:8080/hr-assist/hr-pay:latest
     restart: always
     depends_on:
-      - mysql
+      mysql:
+        condition: service_healthy
     ports:
       - "9000:9000"
     networks:
@@ -41,6 +53,7 @@ services:
 
   # 3. 前端服务
   frontend:
+    container_name: hr-frontend
     image: 127.0.0.1:8080/hr-assist/hr-assistant-front:${FRONTEND_TAG}
     restart: always
     ports:
@@ -50,6 +63,7 @@ services:
 
   # 4. 网关服务
   nginx:
+    container_name: hr-nginx
     image: nginx:latest
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
