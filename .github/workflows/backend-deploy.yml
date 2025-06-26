@@ -20,8 +20,8 @@ jobs:
             cd /opt/hr-deploy
             git pull
             
-            echo "登录 Harbor..."
-            echo "${{ secrets.HARBOR_PASSWORD }}" | docker login http://118.178.189.219:8080 -u ${{ secrets.HARBOR_USERNAME }} --password-stdin
+            echo "走内网: Logging into Harbor..."
+            echo "${{ secrets.HARBOR_PASSWORD }}" | docker login http://127.0.0.1:8080 -u ${{ secrets.HARBOR_USERNAME }} --password-stdin
             
             echo "重启后端服务..."
             docker-compose up -d hr-backend

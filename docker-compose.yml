@@ -18,7 +18,7 @@ services:
 
   # 2. 后端服务（依赖数据库）
   hr-backend:
-    image: 118.178.189.219:8080/hr-assist/hr-backend:${BACKTEND_TAG}
+    image: 127.0.0.1:8080/hr-assist/hr-backend:${BACKTEND_TAG}
     restart: always
     depends_on:
       - mysql
@@ -30,7 +30,7 @@ services:
       - backend
 
   hr-pay:
-    image: 118.178.189.219:8080/hr-assist/hr-pay:latest
+    image: 127.0.0.1:8080/hr-assist/hr-pay:latest
     restart: always
     depends_on:
       - mysql
@@ -41,7 +41,7 @@ services:
 
   # 3. 前端服务
   frontend:
-    image: 118.178.189.219:8080/hr-assist/hr-assistant-front:${FRONTEND_TAG}
+    image: 127.0.0.1:8080/hr-assist/hr-assistant-front:${FRONTEND_TAG}
     restart: always
     ports:
       - "3000:3000"
