@@ -42,12 +42,19 @@ jobs:
             docker-compose ps nginx
             
             echo "检查 nginx 日志..."
-            docker-compose logs nginx --tail=10
+            docker-compose logs nginx || echo "无法查看 nginx 日志"
             
             echo "检查所有服务状态..."
             docker-compose ps
             
             echo "测试 nginx 是否响应..."
-            curl -I http://localhost:80/ || echo "nginx 无响应"
-            
-            echo "✅ nginx 启动完成！" 
+            if curl -I http://localhost:80/ > /dev/null 2>&1; then
+              echo "✅ nginx 启动成功并正常响应！"
+            else
+              echo "❌ nginx 启动失败或无响应"
+              echo "检查 nginx 容器状态..."
+              docker ps | grep nginx || echo "nginx 容器未运行"
+              echo "检查 nginx 详细日志..."
+              docker-compose logs nginx --tail=20
+              exit 1
+            fi 

@@ -42,16 +42,16 @@ services:
     networks:
       - backend
 
-  hr-pay:
-    container_name: hr-pay
-    image: 127.0.0.1:8080/hr-assist/hr-pay:latest
-    restart: always
-    depends_on:
-      - mysql
-    ports:
-      - "9000:9000"
-    networks:
-      - backend
+  # hr-pay:
+  #   container_name: hr-pay
+  #   image: 127.0.0.1:8080/hr-assist/hr-pay:latest
+  #   restart: always
+  #   depends_on:
+  #     - mysql
+  #   ports:
+  #     - "9000:9000"
+  #   networks:
+  #     - backend
 
   # 3. 前端服务
   frontend:
@@ -70,7 +70,6 @@ services:
     depends_on:
       - frontend
       - hr-backend
-      - hr-pay
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
     ports:
