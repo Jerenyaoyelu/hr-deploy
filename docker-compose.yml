@@ -67,6 +67,10 @@ services:
   nginx:
     container_name: hr-nginx
     image: nginx:latest
+    depends_on:
+      - frontend
+      - hr-backend
+      - hr-pay
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
     ports:
