@@ -26,7 +26,7 @@ jobs:
 
             # 添加镜像版本号
             BACKTEND_TAG=v1.0.1-9
-            FRONTEND_TAG=0.1.1-10
+            FRONTEND_TAG=0.1.1-11
             EOF
             
             echo "Environment file created successfully!"
