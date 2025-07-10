@@ -30,8 +30,8 @@ jobs:
             MYSQL_PAY_DB=${{ secrets.MYSQL_PAY_DB }}
 
             # 添加镜像版本号
-            BACKTEND_TAG=v1.0.1-9
-            FRONTEND_TAG=0.1.1-13
+            BACKTEND_TAG=v1.0.1-12
+            FRONTEND_TAG=0.1.1-14
             PAY_TAG=0.0.1-2
             EOF
             
