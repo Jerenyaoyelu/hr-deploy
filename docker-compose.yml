@@ -37,21 +37,36 @@ services:
       - MYSQL_PASSWORD=${MYSQL_ROOT_PASSWORD}
       - MYSQL_DB=${MYSQL_DATABASE}
       - MYSQL_PORT=3306
+      - SECRET_KEY=${JWT_SECRET}
+      - LLM_REQUEST_URL=${LLM_REQUEST_URL}
+      - LLM_MODEL=${LLM_MODEL}
+      - API_KEY=${API_KEY}
     ports:
       - "8000:8000"
     networks:
       - backend
 
-  # hr-pay:
-  #   container_name: hr-pay
-  #   image: 127.0.0.1:8080/hr-assist/hr-pay:latest
-  #   restart: always
-  #   depends_on:
-  #     - mysql
-  #   ports:
-  #     - "9000:9000"
-  #   networks:
-  #     - backend
+  hr-pay:
+    container_name: hr-pay
+    image: 127.0.0.1:8080/hr-assist/hr-pay:${PAY_TAG}
+    restart: always
+    depends_on:
+      - mysql
+    ports:
+      - "9000:9000"
+    environment:
+      - DB_HOST=localhost
+      - DB_PORT=3306
+      - DB_USERNAME=root
+      - DB_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - DB_DATABASE=${MYSQL_PAY_DB}
+      - APP_PORT=9000
+      - NODE_ENV=production
+      - JWT_SECRET=${JWT_SECRET}
+
+
+    networks:
+      - backend
 
   # 3. 前端服务
   frontend:

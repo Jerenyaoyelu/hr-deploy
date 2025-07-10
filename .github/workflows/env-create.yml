@@ -23,10 +23,16 @@ jobs:
             cat > .env << EOF
             MYSQL_ROOT_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD }}
             MYSQL_DATABASE=${{ secrets.MYSQL_DB }}
+            LLM_REQUEST_URL=${{ secrets.LLM_REQUEST_URL}}
+            JWT_SECRET=${{ secrets.JWT_SECRET }}
+            LLM_MODEL=${{ secrets.LLM_MODEL }}
+            API_KEY=${{ secrets.API_KEY }}
+            MYSQL_PAY_DB=${{ secrets.MYSQL_PAY_DB }}
 
             # 添加镜像版本号
             BACKTEND_TAG=v1.0.1-9
             FRONTEND_TAG=0.1.1-13
+            PAY_TAG=0.0.1-2
             EOF
             
             echo "Environment file created successfully!"
