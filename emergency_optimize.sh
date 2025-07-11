@@ -33,9 +33,9 @@ sudo tee /etc/docker/daemon.json > /dev/null <<EOF
 }
 EOF
 
-# 4. 重启Docker服务
-echo "4. 重启Docker服务..."
-sudo systemctl restart docker
+# 4. 配置Docker日志限制（不重启，避免影响Harbor服务）
+echo "4. 配置Docker日志限制..."
+echo "注意：日志限制配置将在下次重启Docker时生效"
 
 # 5. 清理系统缓存
 echo "5. 清理系统缓存..."
