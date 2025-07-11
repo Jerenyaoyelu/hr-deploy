@@ -29,6 +29,10 @@ jobs:
             API_KEY=${{ secrets.API_KEY }}
             MYSQL_PAY_DB=${{ secrets.MYSQL_PAY_DB }}
 
+            # 商户信息暂时fake
+            YUNGOUOS_MCH_ID=${{ secrets.YUNGOUOS_MCH_ID }}
+            YUNGOUOS_KEY=${{ secrets.YUNGOUOS_KEY }}
+
             # 添加镜像版本号
             BACKTEND_TAG=v1.0.1-12
             FRONTEND_TAG=0.1.1-14
