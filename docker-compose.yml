@@ -63,6 +63,8 @@ services:
       - APP_PORT=9000
       - NODE_ENV=production
       - JWT_SECRET=${JWT_SECRET}
+      - YUNGOUOS_MCH_ID=${YUNGOUOS_MCH_ID}
+      - YUNGOUOS_KEY=${YUNGOUOS_KEY}
 
 
     networks:
