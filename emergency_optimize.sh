@@ -20,22 +20,27 @@ echo "2. 清理Docker资源..."
 docker system prune -f
 docker image prune -f
 
-# 3. 限制Docker日志大小
-echo "3. 配置Docker日志限制..."
-sudo tee /etc/docker/daemon.json > /dev/null <<EOF
-{
-  "log-driver": "json-file",
-  "log-opts": {
-    "max-size": "10m",
-    "max-file": "2"
-  },
-  "storage-driver": "overlay2"
-}
-EOF
+# 3. 清理Docker日志文件
+echo "3. 清理Docker日志文件..."
+sudo find /var/lib/docker/containers/ -name "*-json.log" -exec truncate -s 0 {} \;
+echo "Docker日志文件已清理"
 
-# 4. 配置Docker日志限制（不重启，避免影响Harbor服务）
-echo "4. 配置Docker日志限制..."
-echo "注意：日志限制配置将在下次重启Docker时生效"
+# 4. 限制Docker日志大小（仅显示建议，不修改配置）
+echo "4. Docker日志优化建议..."
+echo "当前Docker日志配置："
+if [ -f /etc/docker/daemon.json ]; then
+    cat /etc/docker/daemon.json
+else
+    echo "未找到daemon.json配置文件"
+fi
+echo ""
+echo "建议：如需限制Docker日志大小，请手动修改 /etc/docker/daemon.json"
+echo "添加以下配置："
+echo '  "log-driver": "json-file",'
+echo '  "log-opts": {'
+echo '    "max-size": "10m",'
+echo '    "max-file": "2"'
+echo '  }'
 
 # 5. 清理系统缓存
 echo "5. 清理系统缓存..."

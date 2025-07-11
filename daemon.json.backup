@@ -1,0 +1,21 @@
+{
+  "registry-mirrors": [
+    "https://l8dftyw9.mirror.aliyuncs.com/",
+    "https://registry.cn-hangzhou.aliyuncs.com/",
+    "https://ccr.ccs.tencentyun.com/",
+    "https://hub.c.163.com/"
+  ],
+  "insecure-registries": [
+    "127.0.0.0/8",
+    "::1/128"
+  ],
+  "log-driver": "json-file",
+  "log-opts": {
+    "max-size": "10m",
+    "max-file": "2"
+  },
+  "storage-driver": "overlay2",
+  "storage-opts": [
+    "overlay2.override_kernel_check=true"
+  ]
+} 
