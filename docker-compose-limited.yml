@@ -1,0 +1,138 @@
+version: '3.8'
+services:
+  # 1. 数据库服务（限制资源）
+  mysql:
+    container_name: hr-mysql
+    image: mysql:8.0
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_PORT: 3306
+      MYSQL_SERVER: localhost
+    volumes:
+      - mysql_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    networks:
+      - backend
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 30s
+      retries: 5
+      interval: 30s
+      start_period: 60s
+    command: --default-authentication-plugin=mysql_native_password
+    deploy:
+      resources:
+        limits:
+          memory: 400M
+          cpus: '0.3'
+        reservations:
+          memory: 200M
+          cpus: '0.2'
+
+  # 2. 后端服务（限制资源）
+  hr-backend:
+    container_name: hr-backend
+    image: 127.0.0.1:8080/hr-assist/hr-backend:${BACKTEND_TAG}
+    restart: always
+    depends_on:
+      - mysql
+    environment:
+      - MYSQL_SERVER=mysql
+      - MYSQL_USER=root
+      - MYSQL_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_DB=${MYSQL_DATABASE}
+      - MYSQL_PORT=3306
+      - SECRET_KEY=${JWT_SECRET}
+      - LLM_REQUEST_URL=${LLM_REQUEST_URL}
+      - LLM_MODEL=${LLM_MODEL}
+      - API_KEY=${API_KEY}
+    ports:
+      - "8000:8000"
+    networks:
+      - backend
+    deploy:
+      resources:
+        limits:
+          memory: 300M
+          cpus: '0.3'
+        reservations:
+          memory: 150M
+          cpus: '0.2'
+
+  hr-pay:
+    container_name: hr-pay
+    image: 127.0.0.1:8080/hr-assist/hr-pay:${PAY_TAG}
+    restart: always
+    depends_on:
+      - mysql
+    ports:
+      - "9000:9000"
+    environment:
+      - DB_HOST=localhost
+      - DB_PORT=3306
+      - DB_USERNAME=root
+      - DB_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - DB_DATABASE=${MYSQL_PAY_DB}
+      - APP_PORT=9000
+      - NODE_ENV=production
+      - JWT_SECRET=${JWT_SECRET}
+    networks:
+      - backend
+    deploy:
+      resources:
+        limits:
+          memory: 200M
+          cpus: '0.2'
+        reservations:
+          memory: 100M
+          cpus: '0.1'
+
+  # 3. 前端服务（限制资源）
+  frontend:
+    container_name: hr-frontend
+    image: 127.0.0.1:8080/hr-assist/hr-assistant-front:${FRONTEND_TAG}
+    restart: always
+    ports:
+      - "3000:3000"
+    networks:
+      - backend
+    deploy:
+      resources:
+        limits:
+          memory: 200M
+          cpus: '0.2'
+        reservations:
+          memory: 100M
+          cpus: '0.1'
+
+  # 4. 网关服务（限制资源）
+  nginx:
+    container_name: hr-nginx
+    image: nginx:latest
+    depends_on:
+      - frontend
+      - hr-backend
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    ports:
+      - "80:80"
+    networks:
+      - backend
+    deploy:
+      resources:
+        limits:
+          memory: 100M
+          cpus: '0.1'
+        reservations:
+          memory: 50M
+          cpus: '0.05'
+
+volumes:
+  mysql_data:
+
+networks:
+  backend:
+    driver: bridge 

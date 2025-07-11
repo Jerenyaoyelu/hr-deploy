@@ -37,20 +37,20 @@ FRONTEND_TAG=latest
 
 ### 1. 前端服务 (frontend)
 - **端口**: 3000 (外部可访问)
-- **镜像**: `118.178.189.219:8080/hr-assist/hr-assistant-front:${FRONTEND_TAG}`
+- **镜像**: `127.0.0.1:8080/hr-assist/hr-assistant-front:${FRONTEND_TAG}`
 - **功能**: Next.js 前端应用
 - **访问**: http://your-server-ip:3000
 
 ### 2. 后端服务 (hr-backend)
 - **端口**: 8000 (外部可访问)
-- **镜像**: `118.178.189.219:8080/hr-assist/hr-backend:${BACKTEND_TAG}`
+- **镜像**: `127.0.0.1:8080/hr-assist/hr-backend:${BACKTEND_TAG}`
 - **功能**: FastAPI 后端服务
 - **API 路径**: `/api/v1/*`
 - **访问**: http://your-server-ip:8000
 
 ### 3. 支付服务 (hr-pay)
 - **端口**: 9000 (外部可访问)
-- **镜像**: `118.178.189.219:8080/hr-assist/hr-pay:latest`
+- **镜像**: `127.0.0.1:8080/hr-assist/hr-pay:latest`
 - **功能**: 支付相关服务
 - **API 路径**: `/api/pay/*`
 - **访问**: http://your-server-ip:9000
@@ -81,17 +81,28 @@ FRONTEND_TAG=latest
    EOF
    ```
 
-2. **启动服务**
+2. **系统优化（推荐）**
    ```bash
-   docker-compose up -d
+   # 执行紧急优化脚本
+   chmod +x emergency_optimize.sh
+   sudo ./emergency_optimize.sh
    ```
 
-3. **查看服务状态**
+3. **启动服务**
+   ```bash
+   # 使用标准配置启动
+   docker-compose up -d
+   
+   # 或使用资源限制配置启动（推荐用于1核2G服务器）
+   docker-compose -f docker-compose-limited.yml up -d
+   ```
+
+4. **查看服务状态**
    ```bash
    docker-compose ps
    ```
 
-4. **查看日志**
+5. **查看日志**
    ```bash
    docker-compose logs -f [service_name]
    ```
@@ -122,6 +133,18 @@ FRONTEND_TAG=latest
 - **CORS 支持**: 自动处理跨域请求
 - **Gzip 压缩**: 自动压缩静态资源
 - **WebSocket 支持**: 前端热重载支持
+
+## 系统优化文件
+
+### emergency_optimize.sh
+- **功能**: 一键系统优化脚本
+- **包含**: 添加Swap空间、清理Docker资源、限制日志大小、优化内存参数
+- **适用**: 1核2G等资源紧张的服务器
+
+### docker-compose-limited.yml
+- **功能**: 严格资源限制的Docker配置
+- **特点**: 为每个服务设置内存和CPU限制
+- **适用**: 防止单个容器占用过多资源
 
 ## 故障排查
 

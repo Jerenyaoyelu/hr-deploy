@@ -1,0 +1,114 @@
+name: 系统优化
+
+on:
+  workflow_dispatch:
+  # push:
+  #   branches: [ main, master ]
+    # paths:
+    #   - 'emergency_optimize.sh'
+    #   - 'docker-compose-limited.yml'
+    #   - '.github/workflows/system-optimize.yml'
+
+jobs:
+  optimize:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 检出代码
+      uses: actions/checkout@v4
+      
+    - name: 执行系统优化
+      uses: appleboy/ssh-action@v0.1.8
+      with:
+        host: ${{ secrets.SERVER_HOST }}
+        username: ${{ secrets.ALIYUN_USERNAME }}
+        key: ${{ secrets.ALIYUN_SSH_KEY }}
+        script: |
+          echo "=== 开始系统优化 ==="
+          
+          # 1. 添加Swap空间（如果不存在）
+          if ! swapon --show | grep -q "/swapfile"; then
+            echo "添加2GB Swap空间..."
+            sudo fallocate -l 2G /swapfile
+            sudo chmod 600 /swapfile
+            sudo mkswap /swapfile
+            sudo swapon /swapfile
+            echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
+            echo "Swap空间添加完成"
+          else
+            echo "Swap空间已存在"
+          fi
+          
+          # 2. 清理Docker资源
+          echo "清理Docker资源..."
+          docker system prune -f
+          docker image prune -f
+          
+          # 3. 限制Docker日志大小
+          echo "配置Docker日志限制..."
+          sudo tee /etc/docker/daemon.json > /dev/null << 'DOCKER_CONFIG'
+          {
+            "log-driver": "json-file",
+            "log-opts": {
+              "max-size": "10m",
+              "max-file": "2"
+            },
+            "storage-driver": "overlay2"
+          }
+          DOCKER_CONFIG
+          
+          # 4. 重启Docker守护进程（不影响运行中的容器）
+          echo "重启Docker守护进程..."
+          sudo systemctl restart docker
+          
+          # 5. 清理系统缓存
+          echo "清理系统缓存..."
+          sudo sync
+          sudo echo 3 > /proc/sys/vm/drop_caches
+          
+          # 6. 优化内存管理参数
+          echo "优化内存管理参数..."
+          sudo tee -a /etc/sysctl.conf > /dev/null << 'SYSCTL_CONFIG'
+          
+          # 内存优化
+          vm.swappiness=10
+          vm.vfs_cache_pressure=50
+          vm.dirty_ratio=15
+          vm.dirty_background_ratio=5
+          
+          # 网络优化
+          net.core.rmem_max=16777216
+          net.core.wmem_max=16777216
+          SYSCTL_CONFIG
+          
+          sudo sysctl -p
+          
+          echo "=== 系统优化完成 ==="
+          
+          # 显示优化结果
+          echo "内存使用情况:"
+          free -h
+          echo ""
+          echo "系统负载:"
+          uptime
+          echo ""
+          echo "Docker容器状态:"
+          docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
+          echo ""
+          echo "Swap空间:"
+          swapon --show
+          echo ""
+          echo "可用内存百分比:"
+          echo "可用内存: $(free -m | awk 'NR==2{printf "%.2f%%", $3*100/$2 }')"
+        
+    - name: 优化完成通知
+      run: |
+        echo "🎉 系统优化完成！"
+        echo "服务器: ${{ secrets.SERVER_HOST }}"
+        echo ""
+        echo "优化内容包括:"
+        echo "- 添加2GB Swap空间"
+        echo "- 清理Docker资源"
+        echo "- 限制Docker日志大小"
+        echo "- 优化内存管理参数"
+        echo "- 清理系统缓存" 
