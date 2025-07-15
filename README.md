@@ -97,12 +97,27 @@ FRONTEND_TAG=latest
    docker-compose -f docker-compose-limited.yml up -d
    ```
 
-4. **查看服务状态**
+4. **执行数据库迁移**
+   ```bash
+   # 查看当前数据库版本
+   docker exec hr-backend /app/scripts/docker_migrate_v2.sh current
+   
+   # 升级到最新版本
+   docker exec hr-backend /app/scripts/docker_migrate_v2.sh upgrade
+   
+   # 查看迁移历史
+   docker exec hr-backend /app/scripts/docker_migrate_v2.sh history
+   
+   # 测试环境配置
+   docker exec hr-backend /app/scripts/docker_migrate_v2.sh test
+   ```
+
+5. **查看服务状态**
    ```bash
    docker-compose ps
    ```
 
-5. **查看日志**
+6. **查看日志**
    ```bash
    docker-compose logs -f [service_name]
    ```
@@ -145,6 +160,47 @@ FRONTEND_TAG=latest
 - **功能**: 严格资源限制的Docker配置
 - **特点**: 为每个服务设置内存和CPU限制
 - **适用**: 防止单个容器占用过多资源
+
+## 数据库迁移管理
+
+### 迁移命令
+
+```bash
+# 查看当前数据库版本
+docker exec hr-backend /app/scripts/docker_migrate_v2.sh current
+
+# 升级到最新版本
+docker exec hr-backend /app/scripts/docker_migrate_v2.sh upgrade
+
+# 查看迁移历史
+docker exec hr-backend /app/scripts/docker_migrate_v2.sh history
+
+# 测试环境配置
+docker exec hr-backend /app/scripts/docker_migrate_v2.sh test
+
+# 显示帮助信息
+docker exec hr-backend /app/scripts/docker_migrate_v2.sh help
+```
+
+### 环境变量配置
+
+数据库连接信息从 `docker-compose.yml` 中的环境变量自动读取：
+
+```yaml
+environment:
+  - MYSQL_SERVER=mysql
+  - MYSQL_USER=root
+  - MYSQL_PASSWORD=${MYSQL_ROOT_PASSWORD}
+  - MYSQL_DB=${MYSQL_DATABASE}
+  - MYSQL_PORT=3306
+```
+
+### 迁移脚本特性
+
+- **自动环境变量读取**: 无需手动配置数据库连接
+- **智能等待机制**: 自动等待数据库服务就绪
+- **详细错误诊断**: 提供清晰的错误信息和解决建议
+- **安全日志输出**: 敏感信息不会在日志中显示
 
 ## 故障排查
 
