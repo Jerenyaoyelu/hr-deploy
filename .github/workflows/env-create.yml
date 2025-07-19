@@ -34,7 +34,7 @@ jobs:
             YUNGOUOS_KEY=${{ secrets.YUNGOUOS_KEY }}
 
             # 添加镜像版本号
-            BACKTEND_TAG=v1.0.1-13
+            BACKTEND_TAG=v1.0.1-14
             FRONTEND_TAG=0.1.1-14
             PAY_TAG=0.0.1-2
             EOF
